@@ -1,52 +1,15 @@
-# ===== Dependencies =====
 node_modules/
-
-# ===== Environment & Secrets =====
 .env
-.env.*
-!.env.example
-
-# ===== YouTube Cookies (contains auth tokens) =====
-cookies.txt
+package-lock.json
 yt_cookies.json
+cookies.txt
 
-# ===== Personal Setup Scripts =====
-kaizen-full-setup-v4.sh
+# Kiro IDE
+.kiro/
 
-# ===== OS Files =====
-.DS_Store
-Thumbs.db
-desktop.ini
+# Test files
+tests/
 
-# ===== IDE =====
-.vscode/
-.idea/
-*.swp
-*.swo
-*.sublime-workspace
-*.sublime-project
-
-# ===== Logs =====
+# Build artifacts
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# ===== Runtime =====
-pids/
-*.pid
-*.seed
-
-# ===== Build & Cache =====
-dist/
-build/
-.cache/
-
-# ===== Package Manager Locks (optional - uncomment if not wanted) =====
-# package-lock.json
-
-# ===== Misc =====
-*.bak
 *.tmp
-*.swp
-watchdog.log

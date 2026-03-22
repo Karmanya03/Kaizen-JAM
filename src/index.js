@@ -69,7 +69,7 @@ async function init() {
       useClient: 'IOS',
       highWaterMark: 1 << 25,
     },
-    useYoutubeDL: true,
+    slicePlaylist: false, // Don't slice playlists - get all tracks
     innertubeConfigRaw: {
       lang: 'en',
       location: 'US',
@@ -88,6 +88,10 @@ async function init() {
     } catch (e) {
       console.error('[NP CARD]', e.message);
     }
+  });
+
+  player.events.on('audioTrackAdd', (queue, track) => {
+    console.log(`[QUEUE] Track added: ${track.title} (Queue size: ${queue.tracks.size + 1})`);
   });
 
   player.events.on('playerError', (queue, error) => {

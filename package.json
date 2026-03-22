@@ -31,7 +31,7 @@
     },
     "overrides": {
         "discord-player-youtubei": {
-            "youtubei.js": "^14.0.0"
+            "youtubei.js": "^13.4.0"
         },
         "discord-voip": {
             "discord-api-types": "0.37.97"

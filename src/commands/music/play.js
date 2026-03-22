@@ -51,6 +51,7 @@ export default {
             });
 
             if (searchResult.playlist) {
+                console.log(`[PLAYLIST] Detected: ${searchResult.playlist.title} | Tracks: ${searchResult.tracks.length}`);
                 return interaction.editReply({
                     content: `${config.emojis.music} **Playlist queued:** ${searchResult.playlist.title} (${searchResult.tracks.length} tracks)`,
                 });

@@ -53,7 +53,7 @@ export default {
             if (searchResult.playlist) {
                 console.log(`[PLAYLIST] Detected: ${searchResult.playlist.title} | Tracks: ${searchResult.tracks.length}`);
                 return interaction.editReply({
-                    content: `${config.emojis.music} **Playlist queued:** ${searchResult.playlist.title} (${searchResult.tracks.length} tracks)`,
+                    content: `${config.emojis.music} **Playlist queued:** ${searchResult.playlist.title} (${searchResult.tracks.length} tracks)\n\u26A0\ufe0f Note: YouTube playlists may have stream caching issues. Use Spotify playlists for best results.`,
                 });
             }
 

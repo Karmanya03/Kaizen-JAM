@@ -1,100 +1,30 @@
-# YouTube Playlist Parsing Fix - Complete Solution
+# YouTube Playlist Parsing Fix
 
 ## Problem
-YouTube playlists were being treated as a single video instead of individual tracks. Users couldn't skip or shuffle through playlist tracks.
+YouTube playlists were being treated as a single video instead of parsing individual tracks. Users couldn't skip/shuffle through playlist tracks.
 
 ## Root Cause
-The `YoutubeiExtractor` has a `slicePlaylist` option that, when set to `true` (default), only extracts a portion of the playlist. Additionally, the bundled `youtubei.js` library version may have parsing issues.
+The `discord-player-youtubei` extractor with `youtubei.js` has two issues:
+1. Default `slicePlaylist: true` only queues the first track
+2. **Stream caching bug**: Even with `slicePlaylist: false`, the extractor caches the first track's audio stream and reuses it for all subsequent tracks in the playlist
 
-## Solution
+## Solution Implemented
+1. Set `slicePlaylist: false` in YoutubeiExtractor configuration to parse all playlist tracks
+2. Downgraded `youtubei.js` from v14.0.0 to v13.4.0 for stability (v14 has breaking API parsing errors)
 
-### Option 1: Use YoutubeiExtractor with slicePlaylist: false (DAVE-compatible)
+## Known Limitation
+**YouTube playlists may play the same audio for different tracks** due to a stream caching bug in `discord-player-youtubei`. This is a library-level issue that cannot be fixed without modifying the extractor source code.
 
-**File: `src/index.js`**
-
-```javascript
-await player.extractors.register(YoutubeiExtractor, {
-  cookie: cookieString || undefined,
-  streamOptions: {
-    useClient: 'IOS',
-    highWaterMark: 1 << 25,
-  },
-  slicePlaylist: false, // ← KEY FIX: Don't slice playlists - get all tracks
-  innertubeConfigRaw: {
-    lang: 'en',
-    location: 'US',
-  },
-});
-```
-
-**Pros:**
-- Works with DAVE (Discord Audio Voice Engine)
-- Audio playback works correctly
-- No additional dependencies
-
-**Cons:**
-- May have YouTube.js parsing errors (can be ignored, they're warnings)
-- Requires updated youtubei.js library for best results
-
-### Option 2: Use YouTubeDlpExtractor (More reliable playlist parsing)
-
-**File: `src/index.js`**
-
-```javascript
-import { YouTubeDlpExtractor } from 'discord-player-youtubedlp';
-
-await player.extractors.register(YouTubeDlpExtractor, {
-  agent: cookieString ? { cookies: cookieString } : undefined,
-});
-```
-
-**Pros:**
-- More reliable playlist parsing
-- No YouTube.js parsing errors
-- Better maintained
-
-**Cons:**
-- May not work with DAVE
-- Requires `youtube-dl` or `yt-dlp` binary
-
-## Recommended Solution
-
-**Use YoutubeiExtractor with `slicePlaylist: false`** - This is the best balance between DAVE compatibility and playlist parsing.
-
-The YouTube.js parsing errors are just warnings and don't affect functionality. They occur because YouTube's API changes frequently and the library needs to adapt.
-
-## Testing
-
-After applying the fix, test with a YouTube playlist:
-
-1. Use `/play` with a YouTube playlist URL
-2. You should see: `Playlist queued: [Name] (44 tracks)` (or however many tracks)
-3. Use `/queue` to verify all tracks are listed
-4. Use `/skip` to move to the next track
-5. Audio should play correctly
+**Workaround**: Use Spotify playlists instead, which work correctly.
 
 ## Files Modified
+- `package.json`: Downgraded youtubei.js override to v13.4.0
+- `src/index.js`: Added `slicePlaylist: false` to YoutubeiExtractor config
+- `src/commands/music/play.js`: Added warning message for YouTube playlists
 
-- `src/index.js` - Changed extractor configuration to add `slicePlaylist: false`
-
-## What Changed
-
-**Before:**
-- YouTube playlist URL → Only 1-2 tracks added
-- Can't skip or shuffle playlist tracks
-- Playlist treated as single video
-
-**After:**
-- YouTube playlist URL → All tracks added (up to continuation limit)
-- Full playlist navigation with skip/shuffle
-- Each video in playlist is a separate track
-
-## Compatibility
-
-- ✅ YouTube single videos still work
-- ✅ YouTube playlists now work correctly  
-- ✅ Spotify playlists still work
-- ✅ SoundCloud URLs still work
-- ✅ Search queries still work
-- ✅ DAVE audio engine compatible
-- ✅ All existing functionality preserved
+## Testing
+- ✅ Playlist detection works (shows correct track count)
+- ✅ All tracks are queued with correct titles and URLs
+- ✅ Individual YouTube videos work perfectly
+- ✅ Spotify playlists work perfectly
+- ⚠️ YouTube playlists may have audio stream caching issues (library limitation)
